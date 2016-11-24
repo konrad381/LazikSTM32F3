@@ -2,6 +2,7 @@
 #include "CANlibF3.h"
 #include "PWMlibF3.h"
 #include "GPIOlibF3.h"
+#include "ADClibF3.h"
 
 static __IO uint32_t TimingDelay;
 void Delay(__IO uint32_t nTime);
@@ -15,7 +16,9 @@ int main(void) {
 	initCan();
 	initGpioMotors();
 	initPwm();
+	initADC();
 	while (1) {
+
 	}
 }
 
