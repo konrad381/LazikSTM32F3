@@ -58,9 +58,9 @@ void initCan(void) {
 	CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdList;
 	CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_16bit;
 // Plytka == 1
-	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2460;
+//	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2460;
 // Plytka == 2
-//	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2480;
+	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2480;
 
 //	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x0000;
 
@@ -93,8 +93,6 @@ void USB_LP_CAN1_RX0_IRQHandler(void) {
 	if (CAN_GetITStatus(CAN1, CAN_IT_FMP0) != RESET) {
 		CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
 		readSpeed();
-		setSpeed(kierunek1, predkosc1, kierunek2, predkosc2, kierunek3,
-				predkosc3);
 	}
 }
 
@@ -109,45 +107,8 @@ void USB_HP_CAN1_TX_IRQHandler(void) {
 
 ///==================================================================================================
 //Ustawia odpowiednie predkosci dla kolejnych silnikow wedlug zawartosci odebranej ramki CAN
-void readSpeed() {
-	/*funkcja do obs³ugi ramki 6 bajt, ostatni bit parzystych ramek zawiera informacje o kierunku */
-//	if (RxMessage.DLC == 6) {
-//		kierunek1 = RxMessage.Data[0] & 0x01;
-//		kierunek2 = RxMessage.Data[2] & 0x01;
-//		kierunek3 = RxMessage.Data[4] & 0x01;
-//
-//		predkosc1 = ((RxMessage.Data[1] << 8) | (RxMessage.Data[0] & 0xFE));
-//		predkosc2 = ((RxMessage.Data[3] << 8) | (RxMessage.Data[2] & 0xFE));
-//		predkosc3 = ((RxMessage.Data[5] << 8) | (RxMessage.Data[4] & 0xFE));
-//	}
-	if (RxMessage.Data[0] == 127) {
-		predkosc1 = 0;
-		kierunek1 = 0;
-	} else if (RxMessage.Data[0] > 127) {
-		predkosc1 = RxMessage.Data[0] - 127;
-		kierunek1 = 1;
-	} else if (RxMessage.Data[0] < 127) {
-		predkosc1 = 127-RxMessage.Data[0];
-		kierunek1 = 0;
-	}
-	if (RxMessage.Data[1] == 127) {
-		predkosc2 = 0;
-		kierunek2 = 0;
-	} else if (RxMessage.Data[1] > 127) {
-		predkosc2 = RxMessage.Data[1] - 127;
-		kierunek2 = 1;
-	} else if (RxMessage.Data[1] < 127) {
-		predkosc2 = 127-RxMessage.Data[1];
-		kierunek2 = 0;
-	}
-	if (RxMessage.Data[2] == 127) {
-		predkosc3 = 0;
-		kierunek3 = 0;
-	} else if (RxMessage.Data[2] > 127) {
-		predkosc3 = RxMessage.Data[2] - 127;
-		kierunek3 = 1;
-	} else if (RxMessage.Data[2] < 127) {
-		predkosc3 = 127-RxMessage.Data[2];
-		kierunek3 = 0;
-	}
+void readSpeed(){
+	zadPredkosc1 = RxMessage.Data[0];
+	zadPredkosc2 = RxMessage.Data[1];
+	zadPredkosc3 = RxMessage.Data[2];
 }

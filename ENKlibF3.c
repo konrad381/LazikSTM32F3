@@ -120,7 +120,9 @@ void initENK(void) {
 }
 
 //********************************************PRZERWANIA*****************************
-
+//Obliczenie wartoœci prêdkoœci:
+//sysClock /PrescalerTim *PrescalerInput /liczba impulsów *60(sekund)
+//zeby byly obroty na minute 230400
 //==========enkoder1===============================================
 void TIM2_IRQHandler(void) {
 	TIM_SetCounter(TIM2, 0);
@@ -128,9 +130,9 @@ void TIM2_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM2, TIM_IT_CC2) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_CC2);
 
-		enkPredkosc1 = 230400 / TIM_GetCapture2(TIM2);
+		enkPredkosc1 = 46080 / TIM_GetCapture2(TIM2);
 
-		if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_15) == 1) {
+		if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_15) == 0) {
 			enkPredkosc1 = (-enkPredkosc1);
 		}
 	} else if (TIM_GetITStatus(TIM2, TIM_IT_CC1) != RESET) {
@@ -145,9 +147,9 @@ void TIM1_UP_TIM16_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM16, TIM_IT_CC1) != RESET) {
 		TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
 
-		enkPredkosc2 = 230400 / TIM_GetCapture1(TIM16);
+		enkPredkosc2 = 46080 / TIM_GetCapture1(TIM16);
 
-		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == 1) {
+		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == 0) {
 			enkPredkosc2 = (-enkPredkosc2);
 		}
 	} else if (TIM_GetITStatus(TIM16, TIM_IT_Update) != RESET) {
@@ -162,9 +164,9 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM17, TIM_IT_CC1) != RESET) {
 		TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
 
-		enkPredkosc3 = 230400 / TIM_GetCapture1(TIM17);
+		enkPredkosc3 = 46080 / TIM_GetCapture1(TIM17);
 
-		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11) == 1) {
+		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11) == 0) {
 			enkPredkosc3 = (-enkPredkosc3);
 		}
 	} else if (TIM_GetITStatus(TIM17, TIM_IT_Update) != RESET) {

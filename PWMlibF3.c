@@ -6,38 +6,37 @@ TIM_OCInitTypeDef channel;
 //Ustawia pedkosci kolejnych silnikow (wypelnieniePWM)
 //kierunek: wartosci 1 lub 0 (zaleznie od przylaczenia kabli do silnikow) domyslnie przod==0, tyl==1
 //predkosc: wartosc wypelnienie PWM w zakresie (0 - 128) - mozna zmienic zakres w funkcji initPwm();
-void setSpeed(uint8_t kierunek1, uint16_t predkosc1, uint8_t kierunek2,
-		uint16_t predkosc2, uint8_t kierunek3, uint16_t predkosc3) {
+void setSpeed( int16_t predkosc1, int16_t predkosc2, int16_t predkosc3) {
 
-	if (kierunek1 == 1) {
+	if (predkosc1 >0) {
 		channel.TIM_Pulse = 0;
 		TIM_OC1Init(TIM15, &channel);
 		channel.TIM_Pulse = predkosc1;
 		TIM_OC2Init(TIM15, &channel);
-	} else if (kierunek1 == 0) {
-		channel.TIM_Pulse = predkosc1;
+	} else  {
+		channel.TIM_Pulse = -predkosc1;
 		TIM_OC1Init(TIM15, &channel);
 		channel.TIM_Pulse = 0;
 		TIM_OC2Init(TIM15, &channel);
 	}
-	if (kierunek2 == 1) {
+	if (predkosc2 >0) {
 		channel.TIM_Pulse = 0;
 		TIM_OC1Init(TIM1, &channel);
 		channel.TIM_Pulse = predkosc2;
 		TIM_OC2Init(TIM1, &channel);
-	} else if (kierunek2 == 0) {
-		channel.TIM_Pulse = predkosc2;
+	} else  {
+		channel.TIM_Pulse = -predkosc2;
 		TIM_OC1Init(TIM1, &channel);
 		channel.TIM_Pulse = 0;
 		TIM_OC2Init(TIM1, &channel);
 	}
-	if (kierunek3 == 1) {
+	if (predkosc3 >0) {
 		channel.TIM_Pulse = 0;
 		TIM_OC3Init(TIM1, &channel);
 		channel.TIM_Pulse = predkosc3;
 		TIM_OC4Init(TIM1, &channel);
-	} else if (kierunek2 == 0) {
-		channel.TIM_Pulse = predkosc3;
+	} else  {
+		channel.TIM_Pulse = -predkosc3;
 		TIM_OC3Init(TIM1, &channel);
 		channel.TIM_Pulse = 0;
 		TIM_OC4Init(TIM1, &channel);
@@ -114,7 +113,7 @@ void initPwm() {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM15, ENABLE);
 
-//Motor2 im1 ch1 ch2
+//Motor2 tim1 ch1 ch2
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_6);
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_6);
 //Motor3 tim1 ch3 ch4
@@ -141,14 +140,14 @@ void initPwm() {
 
 	TIM_TimeBaseStructInit(&tim1);
 	tim1.TIM_CounterMode = TIM_CounterMode_Up;
-	tim1.TIM_Prescaler = 64 - 1;
-	tim1.TIM_Period = 128 ;
+	tim1.TIM_Prescaler = 1;
+	tim1.TIM_Period = 10000 ;
 	TIM_TimeBaseInit(TIM1, &tim1);
 
 	TIM_TimeBaseStructInit(&tim15);
 	tim15.TIM_CounterMode = TIM_CounterMode_Up;
-	tim15.TIM_Prescaler = 64 - 1;
-	tim15.TIM_Period = 128 ;
+	tim15.TIM_Prescaler = 1;
+	tim15.TIM_Period = 10000 ;
 	TIM_TimeBaseInit(TIM15, &tim15);
 
 	TIM_OCStructInit(&channel);

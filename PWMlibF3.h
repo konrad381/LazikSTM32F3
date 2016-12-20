@@ -7,8 +7,8 @@
 
 
 
-void setSpeed(uint8_t kierunek1, uint16_t predkosc1, uint8_t kierunek2,
-		uint16_t predkosc2, uint8_t kierunek3, uint16_t predkosc3) ;
+
+void setSpeed( int16_t predkosc1, int16_t predkosc2, int16_t predkosc3);
 void stopMotors(void);
 void initPwm(void);
 

@@ -3,20 +3,28 @@
 #include "PWMlibF3.h"
 #include "GPIOlibF3.h"
 #include "ADClibF3.h"
+#include "ENKlibF3.h"
+#include "PIDlibF3.h"
 
 static __IO uint32_t TimingDelay;
 void Delay(__IO uint32_t nTime);
+int dupa;
+RCC_ClocksTypeDef RCC_Clocks;
 
 //==================================================================================================
 int main(void) {
+
 	if (SysTick_Config(SystemCoreClock / 1000)) {
 		while (1)
 			;
 	}
 	initCan();
+	initENK();
 	initGpioMotors();
 	initPwm();
-	initADC();
+	//initADC();
+
+
 	while (1) {
 
 	}
@@ -34,5 +42,6 @@ void TimingDelay_Decrement(void) {
 	if (TimingDelay != 0x00) {
 		TimingDelay--;
 	}
+	setPID();
 }
 
