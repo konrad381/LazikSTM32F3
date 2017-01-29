@@ -18,7 +18,8 @@
 
 #include "stm32f30x.h"
 #include "PWMlibF3.h"
-
+#include "PIDlibF3.h"
+#include "ADClibF3.h"
 
 CanTxMsg TxMessage;
 CanRxMsg RxMessage;
@@ -27,8 +28,11 @@ volatile int8_t zadPredkosc1;
 volatile int8_t zadPredkosc2;
 volatile int8_t zadPredkosc3;
 
+
+
 void initCan(void);
 void USB_LP_CAN1_RX0_IRQHandler(void);
 void USB_HP_CAN1_TX_IRQHandler(void);
+void sendParam(void);
 
 #endif

@@ -130,7 +130,7 @@ void TIM2_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM2, TIM_IT_CC2) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_CC2);
 
-		enkPredkosc1 = 46080 / TIM_GetCapture2(TIM2);
+		enkPredkosc1 = 4608000 /TIM_GetCapture2(TIM2);
 
 		if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_15) == 0) {
 			enkPredkosc1 = (-enkPredkosc1);
@@ -147,7 +147,7 @@ void TIM1_UP_TIM16_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM16, TIM_IT_CC1) != RESET) {
 		TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
 
-		enkPredkosc2 = 46080 / TIM_GetCapture1(TIM16);
+		enkPredkosc2 = 4608000/ TIM_GetCapture1(TIM16);
 
 		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_10) == 0) {
 			enkPredkosc2 = (-enkPredkosc2);
@@ -164,7 +164,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void) {
 	if (TIM_GetITStatus(TIM17, TIM_IT_CC1) != RESET) {
 		TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
 
-		enkPredkosc3 = 46080 / TIM_GetCapture1(TIM17);
+		enkPredkosc3 = 4608000/ TIM_GetCapture1(TIM17);
 
 		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_11) == 0) {
 			enkPredkosc3 = (-enkPredkosc3);

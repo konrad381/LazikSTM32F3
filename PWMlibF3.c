@@ -41,25 +41,45 @@ void setSpeed( int16_t predkosc1, int16_t predkosc2, int16_t predkosc3) {
 		channel.TIM_Pulse = 0;
 		TIM_OC4Init(TIM1, &channel);
 	}
+}
 
+//==================================================================================================
+//Funkcja odblokowuje wszystkie silniki
+void startMotors(){
 	//Motor1
-	//D1
-	GPIO_ResetBits(GPIOB, GPIO_Pin_10);
-	//D2
-	GPIO_SetBits(GPIOB, GPIO_Pin_11);
+		//D1
+		GPIO_ResetBits(GPIOB, GPIO_Pin_10);
+		//D2
+		GPIO_SetBits(GPIOB, GPIO_Pin_11);
 
-	//Motor2
-	//D1
-	GPIO_ResetBits(GPIOC, GPIO_Pin_6);
-	//D2
-	GPIO_SetBits(GPIOC, GPIO_Pin_7);
+		//Motor2
+		//D1
+		GPIO_ResetBits(GPIOC, GPIO_Pin_6);
+		//D2
+		GPIO_SetBits(GPIOC, GPIO_Pin_7);
 
-	//Motor3
-	//D1
-	GPIO_ResetBits(GPIOC, GPIO_Pin_14);
-	//D2
-	GPIO_SetBits(GPIOC, GPIO_Pin_15);
+		//Motor3
+		//D1
+		GPIO_ResetBits(GPIOC, GPIO_Pin_14);
+		//D2
+		GPIO_SetBits(GPIOC, GPIO_Pin_15);
 
+		channel.TIM_Pulse = 0;
+			TIM_OC1Init(TIM15, &channel);
+			channel.TIM_Pulse = 0;
+			TIM_OC2Init(TIM15, &channel);
+			channel.TIM_Pulse = 0;
+			TIM_OC1Init(TIM1, &channel);
+			channel.TIM_Pulse = 0;
+			TIM_OC2Init(TIM1, &channel);
+			channel.TIM_Pulse = 0;
+			TIM_OC3Init(TIM1, &channel);
+			channel.TIM_Pulse = 0;
+			TIM_OC4Init(TIM1, &channel);
+
+			pidCalka1 = 0;
+			pidCalka2 = 0;
+			pidCalka3 = 0;
 }
 
 //==================================================================================================

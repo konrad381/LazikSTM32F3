@@ -6,9 +6,10 @@
 #include "ENKlibF3.h"
 #include "PIDlibF3.h"
 
+
+
 static __IO uint32_t TimingDelay;
 void Delay(__IO uint32_t nTime);
-int dupa;
 RCC_ClocksTypeDef RCC_Clocks;
 
 //==================================================================================================
@@ -43,5 +44,6 @@ void TimingDelay_Decrement(void) {
 		TimingDelay--;
 	}
 	setPID();
+	sendParam();
 }
 

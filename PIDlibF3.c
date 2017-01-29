@@ -1,7 +1,8 @@
 #include "PIDlibF3.h"
 
-const int wzmocnienieP = 100;
-const int wzmocnienieI = 3;
+volatile uint8_t wzmocnienieP = 100;
+volatile uint8_t wzmocnienieI = 3;
+volatile uint8_t wzmocnienieK = 0;
 
 int16_t pidPredkosc1;
 int16_t pidPredkosc2;
@@ -11,36 +12,48 @@ int16_t pidCalka1 = 0;
 int16_t pidCalka2 = 0;
 int16_t pidCalka3 = 0;
 
+int16_t pidUchyb1 = 0;
+int16_t pidUchyb2 = 0;
+int16_t pidUchyb3 = 0;
+
+int16_t pidNasycenie1 = 0;
+int16_t pidNasycenie2 = 0;
+int16_t pidNasycenie3 = 0;
+
 void setPID(void) {
 
+	pidUchyb1 = (zadPredkosc1*100 - enkPredkosc1);
+	pidUchyb2 = (zadPredkosc2*100 - enkPredkosc2);
+	pidUchyb3 = (zadPredkosc3*100 - enkPredkosc3);
 
-	pidCalka1 += (zadPredkosc1 - enkPredkosc1);
-	pidCalka2 += (zadPredkosc2 - enkPredkosc2);
-	pidCalka3 += (zadPredkosc3 - enkPredkosc3);
+	pidCalka1 += wzmocnienieI *(pidUchyb1 - wzmocnienieK * pidNasycenie1);
+	pidCalka2 += wzmocnienieI *(pidUchyb2 - wzmocnienieK * pidNasycenie2);
+	pidCalka3 +=wzmocnienieI * (pidUchyb3 - wzmocnienieK * pidNasycenie3);
 
-	pidPredkosc1 = wzmocnienieP * (zadPredkosc1 - enkPredkosc1)
-			+ wzmocnienieI * (pidCalka1);
-	pidPredkosc2 = (zadPredkosc2 - enkPredkosc2) * wzmocnienieP+ wzmocnienieI * (pidCalka2);
-	pidPredkosc3 = (zadPredkosc3 - enkPredkosc3) * wzmocnienieP+ wzmocnienieI * (pidCalka3);
-
-//		pidPredkosc1=zadPredkosc1*100;
-//		pidPredkosc2 =zadPredkosc2*100;
-//		pidPredkosc3 = zadPredkosc3*100;
+	pidPredkosc1 = (wzmocnienieP * pidUchyb1 + (pidCalka1))/100;
+	pidPredkosc2 = (wzmocnienieP * pidUchyb2 + (pidCalka2))/100;
+	pidPredkosc3 = (wzmocnienieP * pidUchyb3 + (pidCalka3))/100;
 
 	if (pidPredkosc1 > 10000) {
+		pidNasycenie1 = pidPredkosc1 - 10000;
 		pidPredkosc1 = 10000;
 	} else if (pidPredkosc1 < -10000) {
+		pidNasycenie1 = pidPredkosc1 + 10000;
 		pidPredkosc1 = -10000;
 	}
 	if (pidPredkosc2 > 10000) {
+		pidNasycenie2 = pidPredkosc2 - 10000;
 		pidPredkosc2 = 10000;
 	} else if (pidPredkosc2 < -10000) {
+		pidNasycenie2 = pidPredkosc2 + 10000;
 		pidPredkosc2 = -10000;
 	}
 
 	if (pidPredkosc3 > 10000) {
+		pidNasycenie3 = pidPredkosc3 - 10000;
 		pidPredkosc3 = 10000;
 	} else if (pidPredkosc3 < -10000) {
+		pidNasycenie3 = pidPredkosc3 + 10000;
 		pidPredkosc3 = -10000;
 	}
 

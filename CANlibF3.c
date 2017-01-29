@@ -1,5 +1,7 @@
 #include "CANlibF3.h"
 
+const int stronaPlytka = 0; //1-prawa 0-lewa
+
 //==================================================================================================
 //Funkcja inicjalizuje CAN na pinach PA11 CAN_RX / PA12 CAN_TX
 void initCan(void) {
@@ -57,11 +59,13 @@ void initCan(void) {
 	CAN_FilterInitStructure.CAN_FilterNumber = 0;
 	CAN_FilterInitStructure.CAN_FilterMode = CAN_FilterMode_IdList;
 	CAN_FilterInitStructure.CAN_FilterScale = CAN_FilterScale_16bit;
-// Plytka == 1
-//	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2460;
-// Plytka == 2
-	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2480;
 
+	//wybór strony
+	if (stronaPlytka == 1) {
+		CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2460;
+	} else {
+		CAN_FilterInitStructure.CAN_FilterIdHigh = 0x2480;
+	}
 //	CAN_FilterInitStructure.CAN_FilterIdHigh = 0x0000;
 
 	CAN_FilterInitStructure.CAN_FilterIdLow = 0x0000;
@@ -73,7 +77,7 @@ void initCan(void) {
 	//Inicjalizacja CAN i filtrow
 	CAN_DeInit(CAN1);
 	CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);
-	CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
+	//CAN_ITConfig(CAN1, CAN_IT_TME, ENABLE);
 	CAN_Init(CAN1, &CAN_InitStructure);
 	CAN_FilterInit(&CAN_FilterInitStructure);
 
@@ -86,16 +90,28 @@ void initCan(void) {
 }
 
 void readSpeed(void); //deklaracja funkcji znajdujacej sie nizej
+void pwmStartStop(void);
+void readPid(void);
 //==================================================================================================
 //przerwanie odbiorcze CAN
 //odczytuje wartosci predkosci z nadeslanej ramki i ustawia rzadana predkosc na odpowiednich silnikach
 void USB_LP_CAN1_RX0_IRQHandler(void) {
 	if (CAN_GetITStatus(CAN1, CAN_IT_FMP0) != RESET) {
 		CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
-		readSpeed();
+		switch (RxMessage.Data[0]) {
+		case 'v':
+			readSpeed();
+			break;
+		case 's':
+			pwmStartStop();
+			break;
+		case 'p':
+			readPid();
+			break;
+		}
+
 	}
 }
-
 
 //==================================================================================================
 //Przerwanie nadawcze CAN
@@ -107,8 +123,78 @@ void USB_HP_CAN1_TX_IRQHandler(void) {
 
 ///==================================================================================================
 //Ustawia odpowiednie predkosci dla kolejnych silnikow wedlug zawartosci odebranej ramki CAN
-void readSpeed(){
-	zadPredkosc1 = RxMessage.Data[0];
-	zadPredkosc2 = RxMessage.Data[1];
-	zadPredkosc3 = RxMessage.Data[2];
+void readSpeed() {
+	zadPredkosc1 = RxMessage.Data[1];
+	zadPredkosc2 = RxMessage.Data[2];
+	zadPredkosc3 = RxMessage.Data[3];
+}
+
+void pwmStartStop() {
+	if (RxMessage.Data[1] == 1) {
+		startMotors();
+	} else if (RxMessage.Data[1] == 0) {
+		stopMotors();
+	}
+}
+
+void readPid() {
+	wzmocnienieP = RxMessage.Data[1];
+	wzmocnienieI = RxMessage.Data[2];
+	wzmocnienieK = RxMessage.Data[3];
+
+	pidCalka1 = 0;
+	pidCalka2 = 0;
+	pidCalka3 = 0;
+}
+
+void sendSpeed(void) {
+	TxMessage.StdId = 0x125;
+	TxMessage.DLC = 7;
+	if (stronaPlytka == 1) {
+		TxMessage.Data[0] = 'V';
+	} else {
+		TxMessage.Data[0] = 'v';
+	}
+	TxMessage.Data[1] = enkPredkosc1 & 0xFF;
+	TxMessage.Data[2] = (enkPredkosc1 & 0xFF00) >> 8;
+	TxMessage.Data[3] = enkPredkosc2 & 0xFF;
+	TxMessage.Data[4] = (enkPredkosc2 & 0xFF00) >> 8;
+	TxMessage.Data[5] = enkPredkosc3 & 0xFF;
+	TxMessage.Data[6] = (enkPredkosc3 & 0xFF00) >> 8;
+	CAN_Transmit(CAN1, &TxMessage);
+}
+
+void sendCurrent(void) {
+	TxMessage.StdId = 0x125;
+	TxMessage.DLC = 7;
+	if (stronaPlytka == 1) {
+		TxMessage.Data[0] = 'I';
+	} else {
+		TxMessage.Data[0] = 'i';
+	}
+	TxMessage.Data[1] = adcWartosc[0] & 0xFF;
+	TxMessage.Data[2] = (adcWartosc[0] & 0xFF00) >> 8;
+	TxMessage.Data[3] = adcWartosc[1] & 0xFF;
+	TxMessage.Data[4] = (adcWartosc[1] & 0xFF00) >> 8;
+	TxMessage.Data[5] = adcWartosc[2] & 0xFF;
+	TxMessage.Data[6] = (adcWartosc[2] & 0xFF00) >> 8;
+
+	CAN_Transmit(CAN1, &TxMessage);
+}
+
+void sendParam(void) {
+	static int licznik = -1;
+	if (licznik == -1 && stronaPlytka == 1) {
+		licznik = 50;
+	}
+	licznik++;
+	switch (licznik) {
+	case 100:
+		sendSpeed();
+		break;
+	case 200:
+		sendCurrent();
+		licznik = 0;
+		break;
+	}
 }
