@@ -9,7 +9,7 @@
 void setPID(void);
 
 volatile uint8_t wzmocnienieP;
-volatile uint8_t wzmocnienieI;
+volatile uint16_t wzmocnienieI;
 volatile uint8_t wzmocnienieK;
 
 int16_t pidCalka1;

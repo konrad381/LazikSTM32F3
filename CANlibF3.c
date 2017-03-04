@@ -139,8 +139,8 @@ void pwmStartStop() {
 
 void readPid() {
 	wzmocnienieP = RxMessage.Data[1];
-	wzmocnienieI = RxMessage.Data[2];
-	wzmocnienieK = RxMessage.Data[3];
+	wzmocnienieI = RxMessage.Data[2]|RxMessage.Data[3]<<8;
+	wzmocnienieK = RxMessage.Data[4];
 
 	pidCalka1 = 0;
 	pidCalka2 = 0;
